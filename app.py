@@ -35,3 +35,5 @@ def generateFigures():
     plt.show()
  
 generateMainArray()
+
+print('Hola mundo :3')
