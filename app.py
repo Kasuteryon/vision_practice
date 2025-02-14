@@ -39,3 +39,5 @@ generateMainArray()
 print('Hola mundo :3')
 
 print("Me mandan cartita mañana, okis? :3")
+
+print("odiame más")
