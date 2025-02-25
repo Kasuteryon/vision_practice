@@ -1,5 +1,6 @@
 import yfinance as yf
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def digitSymbol():
     print("-----------------------------------------------------------")
@@ -15,6 +16,11 @@ def chargeStocks(symbol):
         print(f"No se encontraron datos para el símbolo: {symbol}")
     else:
         # Graficar los precios de cierre
+
+        df = pd.DataFrame(hist)
+
+        # Save the dataframe to a CSV file
+        df.to_csv('Stocks'+"_"+symbol+".csv", index=False)
         plt.figure(figsize=(10, 6))
         plt.plot(hist.index, hist['Close'], label='Precio de Cierre', color='blue')
         plt.title(f'Precios de {symbol} - Últimos 12 Meses')
