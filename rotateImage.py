@@ -28,13 +28,11 @@ def runSeparation():
     plt.show()   
 
 def imageRotation(image, degree):
-    # First we will convert the degrees into radians
+ 
     rads = math.radians(degree)
 
-    # We consider the rotated image to be of the same size as the original
     rot_img = np.uint8(np.zeros(image.shape))
 
-    # Finding the center point of rotated (or original) image.
     height = rot_img.shape[0]
     width  = rot_img.shape[1]
 
@@ -52,6 +50,5 @@ def imageRotation(image, degree):
                 rot_img[i,j,:] = image[x,y,:]
 
     return rot_img 
-
 
 runSeparation()  
