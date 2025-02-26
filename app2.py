@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
+import numpy as np
 
 def runSeparation():
     image = cv2.imread("./assets/me2.jpg")
@@ -30,29 +31,38 @@ def runSeparation():
    
     # plt.imshow(secondary_image)
 
-    # GRAY SCALE
+    ## GRAY SCALE
 
-    # A = (r * 0.299)
-    # B = (g * 0.587)
-    # C = (b * 0.114)
-    # third_image = A + B + C
+    A = (r * 0.299)
+    B = (g * 0.587)
+    C = (b * 0.114)
+    gray_image = A + B + C
 
     fg = plt.figure(figsize=(10,10))
-    sub = fg.add_subplot(1, 3, 1)
+    sub = fg.add_subplot(1, 2, 1)
+
+    gray_image = gray_image.astype(np.uint8)
+
+    print(np.max(gray_image))
         
-    sub.imshow(secondary_image)
-
-    A = ((r * 0.01) + r2)
-    B = ((g * 0.01) + g2)
-    C = ((b * 0.01) + b2)
-    fourth_image = A + B + C
-    
-    sub2 = fg.add_subplot(1, 3, 2)
-    sub2.imshow(secondary_image2)
-
-    sub2 = fg.add_subplot(1, 3, 3)
-    sub2.imshow(fourth_image)
+    sub.imshow(gray_image, cmap="gray")
+    sub = fg.add_subplot(1, 2, 2)
+    histogram = cv2.calcHist([gray_image],[0],None,[256],[0,256]) 
+    sub.plot(histogram)
+    # sub.imshow(gray_image)
 
     plt.show()
+
+    # A = ((r * 0.01) + r2)
+    # B = ((g * 0.01) + g2)
+    # C = ((b * 0.01) + b2)
+    # fourth_image = A + B + C
+    
+    # sub2 = fg.add_subplot(1, 3, 2)
+    # sub2.imshow(secondary_image2)
+
+    # sub2 = fg.add_subplot(1, 3, 3)
+    # sub2.imshow(fourth_image)
+
 
 runSeparation()     
