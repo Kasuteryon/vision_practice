@@ -19,12 +19,14 @@ def runSeparation():
 
     fg = plt.figure(figsize=(10,10))
 
+
     sub = fg.add_subplot(1, 2, 1)
-    sub.imshow(secondary_image, cmap='gray')
-  
-    sub = fg.add_subplot(1, 2, 2)
-    sub.imshow(imageRotation(secondary_image, 45), cmap='gray')
-    # sub.imshow(gray_image)
+    sub.imshow(secondary_image)
+    sub.set_title("Original")
+
+    sub.imshow(imageRotation(secondary_image, 45))
+    sub.set_title("Rotada")
+
     plt.show()   
 
 def imageRotation(image, degree):
