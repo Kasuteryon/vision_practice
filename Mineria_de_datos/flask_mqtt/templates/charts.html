@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        canvas {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Temperatura recibida por MQTT</h2>
+    <canvas id="myChart"></canvas>
+
+    <script>
+
+        const socket = io();
+    
+        const data = {
+            labels: [], // aquí irán los timestamps
+            datasets: [
+                {
+                    label: 'Temperatura',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: [],
+                },
+                {
+                    label: 'Humedad',
+                    backgroundColor: 'rgba(20, 255, 132, 0.2)',
+                    borderColor: 'rgb(20, 255, 132)',
+                    data: [],
+                },
+            ]
+        };
+    
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tiempo' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Valor (°C | %)' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+    
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    
+        socket.emit('subscribe', JSON.stringify({ topics: ['upiih_m', 'upiih_h'] }));
+    
+        socket.on('mqtt_message', function (data) {
+         
+            try {
+                const timestamp = new Date().toLocaleTimeString();
+                const payload = data.payload; // Asumimos { "valor": número }
+                const valor = payload;  
+    
+                if (data.topic === "upiih_m") {
+                   
+                    myChart.data.labels.push(timestamp);
+                    myChart.data.datasets[0].data.push(valor);
+                } else if (data.topic === "upiih_h") {
+            
+                    myChart.data.labels.push(timestamp);
+                    myChart.data.datasets[1].data.push(valor);
+                }
+    
+                // Limita a los últimos 20 puntos
+                if (myChart.data.labels.length > 20) {
+                    myChart.data.labels.shift();
+                    myChart.data.datasets[0].data.shift();
+                    myChart.data.datasets[1].data.shift();
+                }
+    
+                myChart.update();
+            } catch (error) {
+                console.error("⚠️ Error al parsear payload:", data.payload);
+            }
+        });
+    </script>
+</body>
+
+</html>

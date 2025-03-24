@@ -4,3 +4,8 @@ opencv-python==4.11.0.86
 yfinance==0.2.54
 pandas
 pytube==15.0.0
+Flask-MQTT==1.2.1
+Flask-SocketIO==5.5.1
+eventlet==0.39.1
+Flask-Bootstrap==3.3.7.1
+bokeh==3.7.0
