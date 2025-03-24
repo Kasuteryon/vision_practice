@@ -19,16 +19,16 @@ bootstrap = Bootstrap(app)
 
 @app.route('/')
 def index():
+    
     return render_template('charts.html')
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
-    print(f"Conectado al broker MQTT con código: {rc}")
-    mqtt.subscribe('upiih_m')
     mqtt.subscribe('upiih_h')
+    mqtt.subscribe('upiih_m')
 
 @socketio.on('subscribe')
-def handle_subscribe():
+def handle_subscribe(json_str):
     
     mqtt.subscribe('upiih_m') 
     mqtt.subscribe('upiih_h') 
@@ -38,7 +38,7 @@ def handle_unsubscribe_all():
     mqtt.unsubscribe_all()
 
 @mqtt.on_message()
-def handle_mqtt_message(message):
+def handle_mqtt_message(client, userdata, message):
     data = dict(
         topic=message.topic,
         payload=message.payload.decode()
