@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
+app.config['MQTT_BROKER_URL'] = 'test.mosquitto.org'
 app.config['MQTT_BROKER_PORT'] = 1883
 app.config['MQTT_KEEPALIVE'] = 5
 app.config['MQTT_TLS_ENABLED'] = False
@@ -26,17 +26,7 @@ def index():
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('upiih_h')
     mqtt.subscribe('upiih_m')
-
-@socketio.on('subscribe')
-def handle_subscribe(json_str):
     
-    mqtt.subscribe('upiih_m') 
-    mqtt.subscribe('upiih_h') 
-
-@socketio.on('unsubscribe_all')
-def handle_unsubscribe_all():
-    mqtt.unsubscribe_all()
-
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     data = dict(
@@ -50,6 +40,16 @@ def handle_mqtt_message(client, userdata, message):
 def handle_logging(client, userdata, level, buf):
     # print(level, buf)
     return
+
+@socketio.on('subscribe')
+def handle_subscribe(json_str):
+    
+    mqtt.subscribe('upiih_m') 
+    mqtt.subscribe('upiih_h') 
+
+@socketio.on('unsubscribe_all')
+def handle_unsubscribe_all():
+    mqtt.unsubscribe_all()
 
 
 if __name__ == '__main__':
