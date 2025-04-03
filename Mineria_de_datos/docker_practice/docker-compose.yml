@@ -1,0 +1,21 @@
+
+services:
+  tbpostgres:
+    image: thingsboard/tb-postgres
+    restart: always
+    ports:
+      - "9050:9090"
+      - "1883:1885"
+    volumes:
+      - data01:/data
+      - lg01:/var/log/thingsboard
+    networks:
+      - vlanupiih
+
+volumes:
+  data01:
+  lg01:
+
+networks:
+  vlanupiih:
+    driver: bridge
