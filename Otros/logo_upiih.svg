@@ -1,0 +1,39 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <style>
+    .cls-1 { fill: #5A1236; } /* Main burgundy */
+    .cls-2 { fill: #333; }     /* Dark gray */
+    .cls-3 { fill: #5B262E; }  /* Alternate burgundy */
+    .cls-4 { fill: #999; }     /* Medium gray */
+    .cls-5 { fill: #F1F1F1; }  /* Light background */
+  </style>
+  <rect width="100%" height="100%" class="cls-5"/>
+
+  <!-- Gear and mountain -->
+  <g transform="translate(350, 250)">
+    <circle r="80" class="cls-1" />
+    <path d="M -40 20 L 0 -30 L 40 20 Z" class="cls-2"/>
+  </g>
+
+  <!-- Compass and ruler -->
+  <g transform="translate(420, 320)">
+    <line x1="0" y1="0" x2="0" y2="60" stroke="#333" stroke-width="8"/>
+    <line x1="0" y1="0" x2="-40" y2="60" stroke="#333" stroke-width="8"/>
+    <rect x="-10" y="60" width="60" height="10" class="cls-3"/>
+  </g>
+
+  <!-- Abstract people -->
+  <circle cx="240" cy="180" r="15" class="cls-1"/>
+  <path d="M210,230 Q240,160 270,230" class="cls-1" fill="none" stroke-width="14" stroke="#5A1236"/>
+
+  <circle cx="290" cy="180" r="15" class="cls-2"/>
+  <path d="M260,230 Q290,160 320,230" class="cls-2" fill="none" stroke-width="14" stroke="#333"/>
+
+  <!-- Stylized bird -->
+  <g transform="translate(120, 270)">
+    <path d="M 0 0 C 30 -30, 60 -30, 70 0 C 60 10, 50 20, 30 30 C 20 20, 10 10, 0 0 Z" class="cls-1"/>
+    <path d="M 30 5 L 35 10 L 30 15 L 25 10 Z" class="cls-5"/>
+  </g>
+
+  <!-- UPIIH Text -->
+  <text x="150" y="500" font-family="Arial, sans-serif" font-size="72" fill="#333">UPIIH</text>
+</svg>

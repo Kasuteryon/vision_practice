@@ -5,7 +5,7 @@ from collections import Counter
 import re
 
 
-CSV_FILE = "betsa.csv"        
+CSV_FILE = "betsa3.csv"        
 FULL_NAME_COLUMN = "Author full names"  
 MAX_NAMES = 1000 # Límite máximo de nombres únicos (limite por consulta de genderize.io)
 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT + Timescale + Flask + Websockets Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        canvas {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Temperatura y Humedad desde TimescaleDB (Tiempo Real + Histórico)</h2>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        const socket = io();
+
+        const data = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Temperatura (°C)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: [],
+                },
+                {
+                    label: 'Humedad (%)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    data: [],
+                },
+            ]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                animation: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tiempo' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Valor' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+
+        // Solicitar los últimos 20 datos históricos al conectar
+        socket.emit('load_history', 20);
+
+        socket.on('history_data', function (entries) {
+            entries.forEach(entry => {
+                const timestamp = new Date(entry.timestamp).toLocaleTimeString();
+
+                data.labels.push(timestamp);
+                data.datasets[0].data.push(entry.temperature);
+                data.datasets[1].data.push(entry.humidity);
+            });
+            myChart.update();
+        });
+
+        // Escucha datos nuevos en tiempo real
+        socket.on('mqtt_message', function (data) {
+            try {
+                const timestamp = new Date(data.timestamp).toLocaleTimeString();
+
+                data.labels.push(timestamp);
+                data.datasets[0].data.push(data.temperature);
+                data.datasets[1].data.push(data.humidity);
+
+                // Limita a los últimos 20 puntos
+                if (data.labels.length > 20) {
+                    data.labels.shift();
+                    data.datasets[0].data.shift();
+                    data.datasets[1].data.shift();
+                }
+
+                myChart.update();
+            } catch (error) {
+                console.error("Error while processing:", data);
+            }
+        });
+    </script>
+</body>
+
+</html>
