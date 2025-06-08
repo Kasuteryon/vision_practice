@@ -5,6 +5,8 @@ from flask_socketio import SocketIO
 from flask_bootstrap import Bootstrap
 import psycopg2
 from datetime import datetime
+from sklearn.cluster import KMeans
+import numpy as np
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -79,14 +81,17 @@ def handle_mqtt_message(client, userdata, message):
         latest_temp = None
         latest_hum = None
 
-
 @mqtt.on_log()
 def handle_logging(client, userdata, level, buf):
     # print(level, buf)
     return
 
+@socketio.on('connect')
+def on_connect():
+    handle_load_history(20)  # o emitir datos en tiempo real más recientes
+    
 @socketio.on('subscribe')
-def handle_subscribe(json_str):
+def handle_subscribe():
     
     mqtt.subscribe('upiih_m') 
     mqtt.subscribe('upiih_h') 
@@ -96,32 +101,36 @@ def handle_unsubscribe_all():
     mqtt.unsubscribe_all()
 
 @socketio.on('load_history')
-def handle_load_history(limit=20):
-    try:
-        cursor.execute("""
-            SELECT time, temperature, humidity
-            FROM dht_readings
-            ORDER BY time DESC
-            LIMIT %s
-        """, (limit,))
-        rows = cursor.fetchall()
-        rows.reverse()  # Para ordenarlos cronológicamente
+def handle_load_history(limit=100):
+    cursor.execute("SELECT time, temperature, humidity FROM dht_readings ORDER BY time DESC LIMIT %s", (limit,))
+    rows = cursor.fetchall()[::-1]
+    socketio.emit('history_data', [
+        {"timestamp": r[0].isoformat(), "temperature": r[1], "humidity": r[2]} for r in rows
+    ])
 
-        data = [
-            {
-                "timestamp": r[0].isoformat(),
-                "temperature": r[1],
-                "humidity": r[2]
-            }
-            for r in rows
-        ]
 
-        socketio.emit('history_data', data)
+# Clustering
+@socketio.on('run_clustering')
+def handle_clustering(k=3):
+    cursor.execute("SELECT time, temperature, humidity FROM dht_readings ORDER BY time DESC LIMIT 100")
+    rows = cursor.fetchall()[::-1]
 
-    except Exception as e:
-        print("Error when consulting history -> ", e)
-        socketio.emit('history_data', [])
+    X = np.array([[r[1], r[2]] for r in rows])
+    times = [r[0].isoformat() for r in rows]
 
+    kmeans = KMeans(n_clusters=k, random_state=0).fit(X)
+    labels = kmeans.labels_.tolist()
+
+    # Emitir sin orden cronológico: solo valores agrupados
+    socketio.emit('clustering_result', [
+        {
+            "timestamp": times[i],
+            "temperature": float(X[i][0]),
+            "humidity": float(X[i][1]),
+            "cluster": labels[i]
+        }
+        for i in range(len(X))
+    ])
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, use_reloader=False, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5050, debug=True, use_reloader=False)

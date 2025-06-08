@@ -10,3 +10,4 @@ Flask-Bootstrap==3.3.7.1
 scikit-learn==1.6.1
 keras==3.9.2
 tensorflow==2.19.0
+psycopg2==2.9.10
